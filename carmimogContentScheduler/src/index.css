@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -73,4 +73,17 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+} */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+  @apply bg-gradient-to-b from-[#fdf6ff] to-[#f3f4f6] text-gray-800;
+  margin: 0;
+  
 }
+

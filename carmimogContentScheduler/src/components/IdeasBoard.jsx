@@ -1,93 +1,175 @@
-import {useState} from "react";
+import { useState } from "react";
+import styled from "styled-components";
+import { useLocalStorage } from '../useLocalStorage';
+
+const [ideas, setIdeas] = useLocalStorage("plannerIdeas", []);
+
+
+// 🎀 Estilos base
+const Container = styled.div`
+  background-color: #fff4fa;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  font-family: 'Inter', sans-serif;
+`;
+
+const Title = styled.h2`
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #d63384;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const Emoji = styled.span`
+  font-size: 1.5rem;
+`;
+
+const IdeaList = styled.ul`
+  list-style: none;
+  padding: 0;
+`;
+
+const IdeaItem = styled.li`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: ${(props) => (props.used ? "#fce4ec" : "#fff")};
+  border: 1px solid #f8bbd0;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  transition: background 0.3s;
+`;
+
+const IdeaText = styled.span`
+  font-size: 0.95rem;
+  color: ${(props) => (props.used ? "#aaa" : "#333")};
+  text-decoration: ${(props) => (props.used ? "line-through" : "none")};
+`;
+
+const UseButton = styled.button`
+  background-color: ${(props) => (props.used ? "#e0e0e0" : "#ec4899")};
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background-color: ${(props) => (props.used ? "#d6d6d6" : "#db2777")};
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  margin-top: 1rem;
+  gap: 0.5rem;
+`;
+
+const Input = styled.input`
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #f3c2d6;
+  font-size: 0.9rem;
+`;
+
+const AddButton = styled.button`
+  background-color: #d63384;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #c2185b;
+  }
+`;
+
+const FilterButton = styled.button`
+  margin-top: 0.75rem;
+  background-color: #fce4ec;
+  color: #d63384;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #ffe6ef;
+  }
+`;
 
 const IdeasBoard = () => {
-    //lista de ideas
-    const [ideas, setIdeas] = useState([
-        {id:1, title: "Idea 1", type: "tipo de idea", used: false},
-        {id:2, title: "idea 2", type: "tipo de idea", used:false},
-    ]);
+  const [ideas, setIdeas] = useState([
+    { text: "Tips de productividad para devs", used: false },
+    { text: "Behind the scenes de edición", used: false },
+    { text: "Mi rutina tech diaria", used: false },
+  ]);
 
-    //formulario
-    const [newIdea, setNewIdea] = useState("");
-    const [newType, setNewType] = useState("tech");
+  const [newIdea, setNewIdea] = useState("");
+  const [showOnlyUnused, setShowOnlyUnused] = useState(false);
 
-    // Agrega una nueva idea
-    const handleAddIdea = (e) => {
+  const toggleUsed = (index) => {
+    const updated = [...ideas];
+    updated[index].used = !updated[index].used;
+    setIdeas(updated);
+  };
+
+  const handleAddIdea = (e) => {
     e.preventDefault();
     if (newIdea.trim() === "") return;
-    const idea = {
-      id: Date.now(),
-      title: newIdea,
-      type: newType,
-      used: false,
-    };
-    setIdeas([idea, ...ideas]);
+
+    setIdeas([...ideas, { text: newIdea.trim(), used: false }]);
     setNewIdea("");
-    setNewType("tech");
   };
 
-  // Marcar una idea como usada
-  const toggleUsed = (id) => {
-    setIdeas(ideas.map(i =>
-      i.id === id ? { ...i, used: !i.used } : i
-    ));
-  };
-
+  const filteredIdeas = showOnlyUnused
+    ? ideas.filter((idea) => !idea.used)
+    : ideas;
 
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-200 transition-all hover:shadow-xl">
-      <h2 className="text-xl font-bold text-pink-600 mb-4 tracking-wide">💡 Ideas de Contenido</h2>
+    <Container>
+      <Title>
+        <Emoji>💡</Emoji> Ideas de contenido
+      </Title>
 
-      {/* Formulario para agregar una idea nueva */}
-      <form onSubmit={handleAddIdea} className="flex flex-col md:flex-row gap-2 mb-4">
-        <input
+      <Form onSubmit={handleAddIdea}>
+        <Input
           type="text"
+          placeholder="Agregar nueva idea..."
           value={newIdea}
           onChange={(e) => setNewIdea(e.target.value)}
-          placeholder="Escribe una idea..."
-          className="border p-2 rounded w-full"
         />
-        <select
-          value={newType}
-          onChange={(e) => setNewType(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="tech">Tech</option>
-          <option value="storytelling">Storytelling</option>
-          <option value="tutorial">Tutorial</option>
-          <option value="trend">Trend</option>
-          <option value="otro">Otro</option>
-        </select>
-        <button type="submit" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-4 py-2 rounded-xl shadow-sm transition-all">
-          Agregar
-        </button>
-      </form>
+        <AddButton type="submit">Agregar</AddButton>
+      </Form>
 
-      {/* Lista de ideas */}
-      <ul className="space-y-2 max-h-64 overflow-y-auto">
-        {ideas.map((idea) => (
-          <li
-            key={idea.id}
-            className={`border p-2 rounded flex justify-between items-center ${
-              idea.used ? "bg-gray-100 text-gray-500 line-through" : ""
-            }`}
-          >
-            <div>
-              <span className="font-semibold">{idea.title}</span>
-              <span className="text-sm ml-2 text-gray-400">({idea.type})</span>
-            </div>
-            <button
-              onClick={() => toggleUsed(idea.id)}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-1 rounded-lg transition-all">
-            
-              {idea.used ? "Recuperar" : "Usado"}
-            </button>
-          </li>
+      <FilterButton onClick={() => setShowOnlyUnused((prev) => !prev)}>
+        {showOnlyUnused ? "Ver todas las ideas" : "Ver solo ideas no usadas"}
+      </FilterButton>
+
+      <IdeaList>
+        {filteredIdeas.map((idea, i) => (
+          <IdeaItem key={i} used={idea.used}>
+            <IdeaText used={idea.used}>{idea.text}</IdeaText>
+            <UseButton used={idea.used} onClick={() => toggleUsed(i)}>
+              {idea.used ? "Usada" : "Marcar como usada"}
+            </UseButton>
+          </IdeaItem>
         ))}
-      </ul>
-    </div>
+      </IdeaList>
+    </Container>
   );
-
 };
 
 export default IdeasBoard;

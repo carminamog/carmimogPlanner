@@ -2,6 +2,59 @@
 
 //Importe para manejar el estado del componente
 import { useState } from "react";
+import styled from "styled-components";
+import { useLocalStorage } from '../useLocalStorage';
+
+const [tasks, setTasks] = useLocalStorage("plannerTasks", []);
+
+
+// Estilos
+const Container = styled.div`
+  background-color: #ffe7f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  font-family: 'Inter', sans-serif;
+`;
+
+const Title = styled.h2`
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #dc1474;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const Emoji = styled.span`
+  font-size: 1.5rem;
+`;
+
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+`;
+
+const Item = styled.li`
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+`;
+
+const Checkbox = styled.input`
+  margin-right: 0.75rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: #ec4899;
+`;
+
+const Label = styled.label`
+  font-size: 0.95rem;
+  color: #333;
+`;
+
 
 const ToDoList = () => {
     //lista de tareas con id, texto, y su estado
@@ -17,28 +70,31 @@ const ToDoList = () => {
     };
 
     return (
-        <div className="bg-white shadow-md p-4 rounded-xl">
+        <Container>
             {/*título*/}
 
-            <h2 className="text-xl font-bold text-pink-600 mb-4 tracking-wide"> ✅ To-Do List</h2>
+            <Title> <Emoji>✅</Emoji> To-Do List</Title>
             {/*mostrar lista de tareas*/}
-            {tasks.map(task => (
-                <div key={task.id} className="flex items-center mb-2">
+            <List>
+                {tasks.map(task => (
+                <Item key={task.id} className="flex items-center mb-2">
                     {/*checkbox de la task*/}
-                    <input 
+                    <Checkbox 
                         type="checkbox"
                         checked={task.done}
                         onChange={() => toggleTask(task.id)}
                         className="mr-2"
                     />
                     {/*tachar texto*/}
-                    <span className={task.done ? "line-through text-gray-400" : "" }>
+                    <Label>
                         {task.text}
-                    </span>
-                </div>
+                    </Label>
+                </Item>
             ))}
+            </List>
+            
        
-        </div>
+        </Container>
     );
 };
 
